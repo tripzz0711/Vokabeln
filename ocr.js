@@ -13,12 +13,19 @@ function loadTesseract() {
   return tessLoad;
 }
 
-let onProgress = () => {};
-async function getWorker() {
+let onProgress = () => {}, workerLang = null;
+async function getWorker(lang) {
   await loadTesseract();
-  if (!workerP) workerP = Tesseract.createWorker(["fra", "deu"], 1, {
-    logger: m => onProgress(m)
-  }).catch(e => { workerP = null; throw e; });
+  if (workerP && workerLang !== lang) {          // Sprache gewechselt: alten Worker beenden
+    const old = workerP; workerP = null;
+    old.then(w => w.terminate()).catch(() => {});
+  }
+  if (!workerP) {
+    workerLang = lang;
+    workerP = Tesseract.createWorker([lang, "deu"], 1, {
+      logger: m => onProgress(m)
+    }).catch(e => { workerP = null; throw e; });
+  }
   return workerP;
 }
 
@@ -114,7 +121,7 @@ function wordsToPairs(words) {
       const fr = r[fc], de = fc === dc ? "" : r[dc];
       if (fr && de) pairs.push([fr, de]);
       else if (!fr && de && pairs.length) pairs[pairs.length - 1][1] += " " + de;   // umbrochene Übersetzung
-      else if (fr && !de && pairs.length && /^[a-zàâçéèêëîïôûùüÿœ(]/.test(fr) && /[,;]$/.test(pairs[pairs.length - 1][0])) pairs[pairs.length - 1][0] += " " + fr;
+      else if (fr && !de && pairs.length && /^[a-zàâçéèêëîïôûùüÿœáíóúñ¿¡(]/.test(fr) && /[,;]$/.test(pairs[pairs.length - 1][0])) pairs[pairs.length - 1][0] += " " + fr;
     });
   }
   if (!pairs.length) {
@@ -127,7 +134,7 @@ function wordsToPairs(words) {
   }
   return pairs
     .map(([a, b]) => [clean(a), clean(b)])
-    .filter(([a, b]) => a.length > 1 && b.length > 1 && !/^\d+$/.test(a) && !/^(unité|atelier|vocabulaire|seite|page)\b/i.test(a));
+    .filter(([a, b]) => a.length > 1 && b.length > 1 && !/^\d+$/.test(a) && !/^(unité|atelier|vocabulaire|unidad|vocabulario|lección|seite|page)\b/i.test(a));
 }
 
 function clean(s) {
@@ -138,10 +145,10 @@ function clean(s) {
           .trim();
 }
 
-async function recognizePhoto(file, progress) {
+async function recognizePhoto(file, lang, progress) {
   onProgress = progress || (() => {});
   const canvas = await prepareImage(file);
-  const worker = await getWorker();
+  const worker = await getWorker(lang || "fra");
   await worker.setParameters({ tessedit_pageseg_mode: "4", preserve_interword_spaces: "1" });
   const { data } = await worker.recognize(canvas, {}, { text: true, blocks: true });
   let pairs = wordsToPairs(collectWords(data));

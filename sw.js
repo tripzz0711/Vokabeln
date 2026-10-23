@@ -1,5 +1,5 @@
 // Offline-Speicher: App-Dateien und Texterkennung werden auf dem iPhone zwischengespeichert
-const CACHE = "lenis-vocab-v1";
+const CACHE = "lenis-vocab-v2";
 const CORE = ["./", "./index.html", "./ocr.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 const EXTERNAL = ["cdn.jsdelivr.net", "tessdata.projectnaptha.com", "fonts.googleapis.com", "fonts.gstatic.com"];
 

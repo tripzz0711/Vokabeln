@@ -160,6 +160,9 @@ nav svg{width:23px;height:23px}
 .rv{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;align-items:center}
 .rv input[type=checkbox]{width:22px;height:22px;accent-color:var(--menthe)}
 .ri{min-width:0;font:inherit;font-size:.95rem;padding:10px 12px;border-radius:14px;border:1px solid var(--edge);background:var(--glass-hi);color:var(--ink)}
+.langs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin-top:16px;border-radius:999px;background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--edge);box-shadow:var(--shadow)}
+.langs button{border:0;background:none;padding:9px 10px;border-radius:999px;font-family:var(--display);font-weight:800;font-size:1rem;color:var(--muted);transition:background .2s,color .2s}
+.langs button[aria-pressed="true"]{background:var(--glass-hi);color:var(--ink);box-shadow:inset 0 1px 0 var(--edge),0 2px 8px rgba(0,0,0,.08)}
 .empty{color:var(--muted);text-align:center;padding:16px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -169,12 +172,16 @@ nav svg{width:23px;height:23px}
 <div class="blobs" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <div class="app">
   <header>
-    <div class="hello" id="hello">Salut Leni&nbsp;! <small>Prête pour quelques mots&nbsp;?</small></div>
+    <div class="hello" id="hello"></div>
     <div class="stats">
       <div class="chip" title="Tage in Folge"><span class="dot" style="background:var(--tomate);color:var(--tomate)"></span><span id="streak">0</span><small class="u">Tage</small></div>
       <div class="chip" title="Punkte"><span class="dot" style="background:var(--citron);color:var(--citron)"></span><span id="xp">0</span><small class="u">Pkt</small></div>
     </div>
   </header>
+  <div class="langs" role="group" aria-label="Sprache">
+    <button type="button" id="lang-fr" data-l="fr">Français</button>
+    <button type="button" id="lang-es" data-l="es">Español</button>
+  </div>
   <main id="main" class="view"></main>
 </div>
 
@@ -188,7 +195,12 @@ nav svg{width:23px;height:23px}
 <script src="ocr.js"></script>
 <script>
 const COLORS=["linear-gradient(150deg,rgba(255,201,60,.45),rgba(255,201,60,.08))","linear-gradient(150deg,rgba(255,122,182,.45),rgba(255,122,182,.08))","linear-gradient(150deg,rgba(34,199,154,.45),rgba(34,199,154,.08))","linear-gradient(150deg,rgba(61,123,255,.45),rgba(61,123,255,.08))","linear-gradient(150deg,rgba(255,90,95,.42),rgba(255,90,95,.08))","linear-gradient(150deg,rgba(142,108,255,.45),rgba(142,108,255,.08))"];
-const BUILTIN=[
+const LANGS={
+ fr:{code:"fr",label:"Français",name:"Französisch",tts:"fr-FR",store:"lenis-vocab",ocr:"fra",custom:"Mes mots",
+  hello:"Salut Leni&nbsp;!",sub:"Prête pour quelques mots&nbsp;?",art:/^(le|la|les|l'|un|une)\s*/,
+  acc:["é","è","ê","à","â","ç","î","ï","ô","û","ù","œ","'"],
+  msgs:["Incroyable&nbsp;!","Très bien&nbsp;!","Pas mal&nbsp;!","Courage&nbsp;!"],perfect:"Parfait&nbsp;!",none:"Rien&nbsp;!",
+  topics:[
  {id:"vacances",fr:"Les vacances",de:"Ferien & Reisen",w:[
   ["la valise","der Koffer"],["la plage","der Strand"],["le billet","die Fahrkarte"],["la gare","der Bahnhof"],["l'auberge de jeunesse (f.)","die Jugendherberge"],["faire du camping","zelten"],["la mer","das Meer"],["la montagne","das Gebirge"],["le séjour","der Aufenthalt"],["partir en vacances","in den Urlaub fahren"],["la crème solaire","die Sonnencreme"],["se baigner","baden"]]},
  {id:"ville",fr:"En ville",de:"Stadt & Wege",w:[
@@ -201,15 +213,34 @@ const BUILTIN=[
   ["être content(e)","froh sein"],["être triste","traurig sein"],["avoir peur","Angst haben"],["être en colère","wütend sein"],["être amoureux/-se","verliebt sein"],["se disputer","sich streiten"],["s'entendre bien avec","sich gut verstehen mit"],["la confiance","das Vertrauen"],["être déçu(e)","enttäuscht sein"],["avoir honte","sich schämen"],["le/la meilleur(e) ami(e)","der/die beste Freund(in)"],["s'excuser","sich entschuldigen"]]},
  {id:"verbes",fr:"Verbes & passé composé",de:"Wichtige Verben",w:[
   ["j'ai fait","ich habe gemacht"],["je suis allé(e)","ich bin gegangen"],["j'ai pris","ich habe genommen"],["j'ai vu","ich habe gesehen"],["je suis venu(e)","ich bin gekommen"],["j'ai dû","ich musste"],["j'ai pu","ich konnte"],["j'ai mis","ich habe gelegt/angezogen"],["je suis resté(e)","ich bin geblieben"],["j'ai écrit","ich habe geschrieben"],["j'ai lu","ich habe gelesen"],["je me suis levé(e)","ich bin aufgestanden"]]}
-];
-const ACCENTS=["é","è","ê","à","â","ç","î","ï","ô","û","ù","œ","'"];
+]},
+ es:{code:"es",label:"Español",name:"Spanisch",tts:"es-ES",store:"lenis-vocab-es",ocr:"spa",custom:"Mis palabras",
+  hello:"¡Hola Leni!",sub:"¿Lista para unas palabras?",art:/^(el|la|los|las|un|una)\s+/,
+  acc:["á","é","í","ó","ú","ñ","ü","¿","¡"],
+  msgs:["¡Increíble!","¡Muy bien!","¡No está mal!","¡Ánimo!"],perfect:"¡Perfecto!",none:"¡Nada!",
+  topics:[
+ {id:"saludos",fr:"¡Hola! Saludos",de:"Begrüßen & Vorstellen",w:[
+  ["¡Hola!","Hallo!"],["¿Qué tal?","Wie geht's?"],["¿Cómo te llamas?","Wie heißt du?"],["Me llamo …","Ich heiße …"],["¿Cuántos años tienes?","Wie alt bist du?"],["Tengo trece años.","Ich bin dreizehn Jahre alt."],["¿De dónde eres?","Woher kommst du?"],["Soy de Alemania.","Ich komme aus Deutschland."],["¡Hasta luego!","Bis später!"],["adiós","tschüss"],["por favor","bitte"],["gracias","danke"]]},
+ {id:"familia",fr:"La familia",de:"Familie & Haustiere",w:[
+  ["la madre","die Mutter"],["el padre","der Vater"],["los padres","die Eltern"],["el hermano","der Bruder"],["la hermana","die Schwester"],["los abuelos","die Großeltern"],["el tío","der Onkel"],["la tía","die Tante"],["el primo","der Cousin"],["la prima","die Cousine"],["el perro","der Hund"],["el gato","die Katze"]]},
+ {id:"instituto",fr:"El instituto",de:"Schule",w:[
+  ["el instituto","die Schule (Gymnasium)"],["la clase","die Klasse, der Unterricht"],["el profesor","der Lehrer"],["la profesora","die Lehrerin"],["el alumno","der Schüler"],["la asignatura","das Schulfach"],["el cuaderno","das Heft"],["la mochila","der Schulrucksack"],["el recreo","die Pause"],["los deberes","die Hausaufgaben"],["aprender","lernen"],["difícil","schwierig"]]},
+ {id:"tiempolibre",fr:"El tiempo libre",de:"Freizeit & Hobbys",w:[
+  ["jugar al fútbol","Fußball spielen"],["escuchar música","Musik hören"],["leer","lesen"],["bailar","tanzen"],["nadar","schwimmen"],["montar en bici","Fahrrad fahren"],["ver la tele","fernsehen"],["quedar con amigos","sich mit Freunden treffen"],["el fin de semana","das Wochenende"],["me gusta …","ich mag …"],["me encanta …","ich liebe …"],["¿Qué haces?","Was machst du?"]]},
+ {id:"comida",fr:"La comida",de:"Essen & Trinken",w:[
+  ["el desayuno","das Frühstück"],["la comida","das Mittagessen"],["la cena","das Abendessen"],["el pan","das Brot"],["el agua (f.)","das Wasser"],["la leche","die Milch"],["la fruta","das Obst"],["el queso","der Käse"],["el bocadillo","das belegte Brötchen"],["tener hambre","Hunger haben"],["tener sed","Durst haben"],["la cuenta","die Rechnung"]]},
+ {id:"verbos",fr:"Verbos importantes",de:"Wichtige Verben",w:[
+  ["ser","sein (Eigenschaft)"],["estar","sein (Ort, Zustand)"],["tener","haben"],["hacer","machen"],["ir","gehen, fahren"],["hablar","sprechen"],["comer","essen"],["beber","trinken"],["vivir","wohnen, leben"],["escribir","schreiben"],["querer","wollen, lieben"],["poder","können"]]}
+]}
+};
+let LANG="fr";try{if(localStorage.getItem("lenis-lang")==="es")LANG="es"}catch(e){}
+let L=LANGS[LANG],BUILTIN=L.topics,ACCENTS=L.acc;
 
-let S={xp:0,streak:0,last:"",box:{},custom:[],sel:"vacances",name:"Leni"};
-function load(){try{const r=localStorage.getItem("lenis-vocab");if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
-function save(){try{localStorage.setItem("lenis-vocab",JSON.stringify(S))}catch(e){}}
-load();
+let S;
+function load(){S={xp:0,streak:0,last:"",box:{},custom:[],sel:BUILTIN[0].id,name:"Leni"};try{const r=localStorage.getItem(L.store);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
+function save(){try{localStorage.setItem(L.store,JSON.stringify(S))}catch(e){}}
 
-const topics=()=>BUILTIN.concat(S.custom.length?[{id:"custom",fr:"Mes mots",de:"Eigene Vokabeln",w:S.custom}]:[]);
+const topics=()=>BUILTIN.concat(S.custom.length?[{id:"custom",fr:L.custom,de:"Eigene Vokabeln",w:S.custom}]:[]);
 const key=w=>w[0]+"|"+w[1];
 const lvl=w=>S.box[key(w)]||0; // 0 neu, 1-4 Stufe
 const pct=t=>Math.round(t.w.reduce((a,w)=>a+Math.min(lvl(w),3),0)/(t.w.length*3)*100);
@@ -229,9 +260,9 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");cl
 function grade(w,ok){const k=key(w);S.box[k]=ok?Math.min((S.box[k]||0)+1,4):1;if(ok){S.xp+=10;tickStreak()}save();stats()}
 
 let voice=null;
-function pickVoice(){try{voice=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith("fr"))||null}catch(e){}}
+function pickVoice(){try{voice=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith(L.code))||null}catch(e){}}
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
-function say(t){try{const u=new SpeechSynthesisUtterance(t.replace(/\(.*?\)/g,""));u.lang="fr-FR";if(voice)u.voice=voice;u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){toast("Vorlesen geht hier leider nicht")}}
+function say(t){try{const u=new SpeechSynthesisUtterance(t.replace(/\(.*?\)/g,""));u.lang=L.tts;if(voice)u.voice=voice;u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){toast("Vorlesen geht hier leider nicht")}}
 const SPK='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>';
 const BACK='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
 
@@ -276,7 +307,7 @@ function cards(){
   const w=R.words[R.i];
   $("#main").innerHTML=topbar()+`<div class="flip" id="flip"><div class="flip-in">
     <div class="face f"><span class="lbl">Deutsch</span><div class="word">${esc(w[1])}</div><div class="hint">Tippen zum Umdrehen</div></div>
-    <div class="face b"><span class="lbl">Français</span><button class="speak" id="spk" aria-label="Vorlesen">${SPK}</button><div class="word">${esc(w[0])}</div></div>
+    <div class="face b"><span class="lbl">${L.label}</span><button class="speak" id="spk" aria-label="Vorlesen">${SPK}</button><div class="word">${esc(w[0])}</div></div>
   </div></div>
   <div class="row"><button class="btn no" id="no">Noch nicht</button><button class="btn yes" id="yes">Gewusst!</button></div>`;
   const f=$("#flip");f.onclick=e=>{if(e.target.closest("#spk"))return;f.classList.toggle("on");if(f.classList.contains("on"))say(w[0])};
@@ -288,7 +319,7 @@ function quiz(){
   const w=R.words[R.i], toFr=Math.random()<.5;
   let others=shuffle(BUILTIN.flatMap(t=>t.w).concat(S.custom).filter(x=>key(x)!==key(w))).slice(0,3);
   const opts=shuffle([w,...others]);
-  $("#main").innerHTML=topbar()+`<div class="q"><div class="lbl">${toFr?"Was heißt auf Französisch …":"Was bedeutet …"}</div>
+  $("#main").innerHTML=topbar()+`<div class="q"><div class="lbl">${toFr?"Was heißt auf "+L.name+" …":"Was bedeutet …"}</div>
     <div class="word">${esc(toFr?w[1]:w[0])}</div>${toFr?"":`<button class="speak" id="spk" aria-label="Vorlesen" >${SPK}</button>`}</div>
     <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${esc(toFr?o[0]:o[1])}</button>`).join("")}</div>`;
   if(!toFr)$("#spk").onclick=()=>say(w[0]);
@@ -302,8 +333,8 @@ function quiz(){
 
 function type(){
   const w=R.words[R.i];
-  $("#main").innerHTML=topbar()+`<div class="q"><div class="lbl">Schreib auf Französisch</div><div class="word">${esc(w[1])}</div></div>
-    <form id="tf" autocomplete="off"><input class="inp" id="ans" placeholder="Deine Antwort …" autocapitalize="off" spellcheck="false" aria-label="Antwort auf Französisch">
+  $("#main").innerHTML=topbar()+`<div class="q"><div class="lbl">Schreib auf ${L.name}</div><div class="word">${esc(w[1])}</div></div>
+    <form id="tf" autocomplete="off"><input class="inp" id="ans" placeholder="Deine Antwort …" autocapitalize="off" spellcheck="false" aria-label="Antwort auf ${L.name}">
     <div class="acc">${ACCENTS.map(a=>`<button type="button" data-a="${a}">${a}</button>`).join("")}</div>
     <div class="feedback" id="fb" aria-live="polite"></div>
     <button class="btn go" id="chk">Prüfen</button></form>`;
@@ -312,10 +343,10 @@ function type(){
   let checked=false,result=false;
   $("#tf").onsubmit=e=>{e.preventDefault();
     if(checked)return adv(result);
-    const a=strip(inp.value),c=strip(w[0]),bare=c.replace(/^(le|la|les|l'|un|une)\s*/,"");
+    const a=strip(inp.value),c=strip(w[0]),bare=c.replace(L.art,"");
     const noAcc=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"");
     const fb=$("#fb");
-    if(a===c){result=true;fb.className="feedback ok pop";fb.innerHTML="Parfait&nbsp;!";}
+    if(a===c){result=true;fb.className="feedback ok pop";fb.innerHTML=L.perfect;}
     else if(noAcc(a)===noAcc(c)){result=true;fb.className="feedback ok";fb.innerHTML=`Fast! Achte auf die Akzente: <em>${esc(w[0])}</em>`;}
     else if(a===bare){result=false;fb.className="feedback ko";fb.innerHTML=`Artikel nicht vergessen: <em>${esc(w[0])}</em>`;}
     else{result=false;fb.className="feedback ko";fb.innerHTML=`Richtig wäre: <em>${esc(w[0])}</em>`;inp.classList.add("shake")}
@@ -325,7 +356,7 @@ function type(){
 
 function done(){
   const n=R.words.length,p=Math.round(R.ok/n*100);
-  const msg=p===100?"Incroyable&nbsp;!":p>=70?"Très bien&nbsp;!":p>=40?"Pas mal&nbsp;!":"Courage&nbsp;!";
+  const msg=p===100?L.msgs[0]:p>=70?L.msgs[1]:p>=40?L.msgs[2]:L.msgs[3];
   $("#main").innerHTML=`<div class="result pop"><div class="stamp">${msg}</div><div class="big">${R.ok}/${n}</div>
     <p>${p>=70?"Super Runde. Die Wörter, die noch hakten, kommen beim nächsten Mal zuerst dran.":"Die schwierigen Wörter landen unter „Schwierige“, dort kannst du sie extra üben."}</p>
     <div class="row"><button class="btn" id="home">Zu den Themen</button><button class="btn go" id="again">Nochmal</button></div></div>`;
@@ -345,10 +376,10 @@ function addView(){
     <form id="af"><div class="field"><label for="txt">Neue Wörter</label>
     <textarea id="txt" placeholder="le chat - die Katze&#10;la fenêtre = das Fenster&#10;apprendre - lernen"></textarea></div>
     <button class="btn go">Hinzufügen</button></form>
-    <h2>Mes mots <span style="font-weight:600;color:var(--muted);font-size:1rem">(${S.custom.length})</span></h2>
+    <h2>${L.custom} <span style="font-weight:600;color:var(--muted);font-size:1rem">(${S.custom.length})</span></h2>
     ${S.custom.length?`<div class="list">${S.custom.map(w=>`<div><b>${esc(w[0])}</b><span>${esc(w[1])}</span></div>`).join("")}</div>
       <div style="display:flex;gap:16px;align-items:center;justify-content:space-between;margin-top:8px"><button class="del" id="cpy" style="color:var(--ciel)">Liste kopieren</button><button class="del" id="clr">Alle eigenen Wörter löschen</button></div>`
-     :`<div class="empty">Noch keine eigenen Wörter. Danach erscheinen sie als eigenes Thema „Mes mots“.</div>`}`;
+     :`<div class="empty">Noch keine eigenen Wörter. Danach erscheinen sie als eigenes Thema „${L.custom}“.</div>`}`;
   $("#af").onsubmit=e=>{e.preventDefault();
     const lines=$("#txt").value.split("\n").map(l=>l.split(/\s+[-–=]\s+|\s*=\s*|\s+-\s*|\t|;/)).filter(p=>p.length>=2&&p[0].trim()&&p[1].trim()).map(p=>[p[0].trim(),p[1].trim()]);
     if(!lines.length){toast("Schreib z. B.: le chat - die Katze");return}
@@ -367,7 +398,7 @@ function setupPhoto(){
     out.innerHTML=`<div class="scan"><span class="spin"></span><span id="scanTxt">Foto wird vorbereitet …</span></div><div class="progress" style="margin-top:10px"><i id="scanBar" style="width:0%"></i></div>`;
     const steps={"loading tesseract core":"Texterkennung wird geladen …","loading language traineddata":"Sprachdaten werden geladen (nur beim ersten Mal) …","initializing api":"Wird gestartet …","recognizing text":"Wörter werden gelesen …"};
     try{
-      const pairs=await recognizePhoto(f,m=>{const t=$("#scanTxt"),b=$("#scanBar");if(!t)return;if(steps[m.status])t.textContent=steps[m.status];if(b&&typeof m.progress==="number")b.style.width=Math.round(m.progress*100)+"%"});
+      const pairs=await recognizePhoto(f,L.ocr,m=>{const t=$("#scanTxt"),b=$("#scanBar");if(!t)return;if(steps[m.status])t.textContent=steps[m.status];if(b&&typeof m.progress==="number")b.style.width=Math.round(m.progress*100)+"%"});
       if(!pairs.length){out.innerHTML=`<div class="scan">Auf dem Foto wurden keine Wortpaare gefunden. Fotografier die Liste gerade von oben, mit gutem Licht und ohne Schatten.</div>`;return}
       renderReview(pairs);
     }catch(e){
@@ -378,7 +409,7 @@ function setupPhoto(){
 function renderReview(pairs){
   const out=$("#photoOut");
   out.innerHTML=`<p class="note" style="margin:12px 0 8px"><b>${pairs.length} Wortpaare erkannt.</b> Prüf sie kurz: Tippfehler direkt korrigieren, Falsches abhaken.</p>
-    <div class="rev">${pairs.map((p,i)=>`<div class="rv"><input type="checkbox" id="rc${i}" checked aria-label="Übernehmen"><input class="ri" id="rf${i}" value="${esc(p[0])}" aria-label="Französisch"><input class="ri" id="rd${i}" value="${esc(p[1])}" aria-label="Deutsch"></div>`).join("")}</div>
+    <div class="rev">${pairs.map((p,i)=>`<div class="rv"><input type="checkbox" id="rc${i}" checked aria-label="Übernehmen"><input class="ri" id="rf${i}" value="${esc(p[0])}" aria-label="${L.name}"><input class="ri" id="rd${i}" value="${esc(p[1])}" aria-label="Deutsch"></div>`).join("")}</div>
     <div class="row" style="margin-top:12px"><button class="btn" id="swap" type="button">Spalten tauschen</button><button class="btn go" id="takeAll" type="button">Übernehmen</button></div>`;
   const read=()=>pairs.map((_,i)=>[$("#rf"+i).value.trim(),$("#rd"+i).value.trim(),$("#rc"+i).checked]);
   $("#swap").onclick=()=>renderReview(read().map(([a,b])=>[b,a]));
@@ -397,11 +428,25 @@ function hardView(){
     <p class="note">Hier sammeln sich alle Wörter, die du zuletzt nicht wusstest. Sobald du eines richtig hast, verschwindet es wieder.</p>
     ${hard.length?`<div class="list" style="margin:12px 0 16px">${hard.map(w=>`<div><b>${esc(w[0])}</b><span>${esc(w[1])}</span></div>`).join("")}</div>
       <div class="modes"><button class="mode" data-m="cards">Karten</button><button class="mode" data-m="quiz">Quiz</button><button class="mode" data-m="type">Schreiben</button></div>`
-     :`<div class="empty" style="padding:40px 16px"><div class="stamp">Rien&nbsp;!</div><br>Gerade keine schwierigen Wörter. Übe ein Thema, dann sammeln sie sich hier.</div>`}`;
+     :`<div class="empty" style="padding:40px 16px"><div class="stamp">${L.none}</div><br>Gerade keine schwierigen Wörter. Übe ein Thema, dann sammeln sie sich hier.</div>`}`;
   document.querySelectorAll("#main .mode").forEach(b=>b.onclick=()=>start(b.dataset.m,hard));
 }
 
-stats();home();
+function applyLang(){
+  $("#hello").innerHTML=L.hello+" <small>"+L.sub+"</small>";
+  document.querySelectorAll(".langs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===LANG?"true":"false"));
+  pickVoice();stats();
+}
+function switchLang(c){
+  if(c===LANG)return;
+  LANG=c;L=LANGS[c];BUILTIN=L.topics;ACCENTS=L.acc;
+  try{localStorage.setItem("lenis-lang",c)}catch(e){}
+  load();applyLang();
+  const cur=document.querySelector('nav button[aria-current="page"]');
+  ({home,add:addView,hard:hardView})[cur?cur.dataset.tab:"home"]();
+}
+document.querySelectorAll(".langs button").forEach(b=>b.onclick=()=>switchLang(b.dataset.l));
+load();applyLang();home();
 </script>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
