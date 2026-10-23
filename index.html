@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vocabulaire">
+<meta name="theme-color" content="#E9EDF8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#080A18" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<title>Lenis Vocabulaire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Layout: one-column phone app floating on drifting colour blobs; frosted glass panels, pill tab bar */
+:root{
+  --bg:#E9EDF8; --ink:#0F1330; --muted:#565B7A;
+  --glass:rgba(255,255,255,.42); --glass-hi:rgba(255,255,255,.62); --edge:rgba(255,255,255,.85); --edge-lo:rgba(15,19,48,.08);
+  --shadow:0 10px 30px rgba(30,40,90,.14), inset 0 1px 0 rgba(255,255,255,.9);
+  --tomate:#FF5A5F; --ciel:#3D7BFF; --citron:#FFC93C; --menthe:#22C79A; --rose:#FF7AB6; --lila:#8E6CFF;
+  --b1:#FF8A7A; --b2:#5AA2FF; --b3:#FFD45E; --b4:#4FE0B6;
+  --good:#12A97A; --bad:#E5484D; --soft:rgba(15,19,48,.06);
+  --display:"Bricolage Grotesque", -apple-system, "SF Pro Display", system-ui, sans-serif;
+  --body:-apple-system, "SF Pro Text", "Figtree", system-ui, "Segoe UI", sans-serif;
+  --blur:blur(22px) saturate(180%);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#080A18; --ink:#F4F6FF; --muted:#A7ACCB;
+  --glass:rgba(255,255,255,.08); --glass-hi:rgba(255,255,255,.14); --edge:rgba(255,255,255,.22); --edge-lo:rgba(0,0,0,.3);
+  --shadow:0 12px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.18);
+  --b1:#C2364F; --b2:#2D52C9; --b3:#B8861A; --b4:#138F72;
+  --good:#3DE0A8; --bad:#FF6B6F; --soft:rgba(255,255,255,.08); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#080A18; --ink:#F4F6FF; --muted:#A7ACCB;
+  --glass:rgba(255,255,255,.08); --glass-hi:rgba(255,255,255,.14); --edge:rgba(255,255,255,.22); --edge-lo:rgba(0,0,0,.3);
+  --shadow:0 12px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.18);
+  --b1:#C2364F; --b2:#2D52C9; --b3:#B8861A; --b4:#138F72;
+  --good:#3DE0A8; --bad:#FF6B6F; --soft:rgba(255,255,255,.08); color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,label:focus-visible{outline:3px solid var(--ciel);outline-offset:2px}
+/* Background blobs */
+.blobs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.blobs i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.75;animation:drift 22s ease-in-out infinite alternate}
+.blobs i:nth-child(1){width:60vmax;height:60vmax;background:var(--b1);top:-20vmax;left:-15vmax}
+.blobs i:nth-child(2){width:55vmax;height:55vmax;background:var(--b2);top:10vh;right:-25vmax;animation-duration:26s;animation-delay:-6s}
+.blobs i:nth-child(3){width:45vmax;height:45vmax;background:var(--b3);bottom:-18vmax;left:-10vmax;animation-duration:30s;animation-delay:-12s}
+.blobs i:nth-child(4){width:40vmax;height:40vmax;background:var(--b4);bottom:-10vmax;right:-8vmax;animation-duration:24s;animation-delay:-3s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(6vmax,4vmax) scale(1.1)}100%{transform:translate(-4vmax,8vmax) scale(.95)}}
+.glass{background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--edge);box-shadow:var(--shadow)}
+.app{position:relative;margin-top:env(safe-area-inset-top,0px)!important;z-index:1;max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 120px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hello{font-family:var(--display);font-weight:800;font-size:1.9rem;line-height:1.02;letter-spacing:-.03em;text-wrap:balance}
+.hello small{display:block;font-family:var(--body);font-weight:500;font-size:.92rem;color:var(--muted);letter-spacing:0;margin-top:4px}
+.stats{display:flex;gap:8px}
+.chip{display:flex;align-items:center;gap:6px;border-radius:999px;padding:7px 12px;font-weight:700;font-variant-numeric:tabular-nums;font-size:.95rem;
+  background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--edge);box-shadow:var(--shadow)}
+.chip .u{font-size:.72rem;font-weight:600;color:var(--muted)}
+.chip .dot{width:10px;height:10px;border-radius:50%;box-shadow:0 0 10px currentColor}
+h2{font-family:var(--display);font-weight:800;font-size:1.3rem;margin:24px 0 12px;letter-spacing:-.02em}
+.view{display:flex;flex-direction:column}
+/* shared glass surfaces */
+.topic,.mode,.back,.progress,.q,.opt,.inp,.acc button,textarea,.list,.photo,.btn,.face{
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--edge);box-shadow:var(--shadow)}
+.topics{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.topic{text-align:left;border-radius:24px;padding:15px;color:var(--ink);display:flex;flex-direction:column;gap:6px;min-height:128px;
+  transition:transform .2s cubic-bezier(.3,1.5,.5,1);position:relative;overflow:hidden;background-color:var(--glass)}
+.topic::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(160deg,rgba(255,255,255,.45),transparent 45%);pointer-events:none;opacity:.6}
+.topic:active,.mode:active,.btn:active,.opt:active{transform:scale(.96)}
+.topic.sel{border:2px solid var(--ink)}
+.topic .fr{font-family:var(--display);font-weight:800;font-size:1.15rem;line-height:1.1;position:relative;z-index:1}
+.topic .de{font-size:.85rem;font-weight:600;color:var(--muted);position:relative;z-index:1}
+.bar{margin-top:auto;height:6px;border-radius:99px;background:var(--soft);overflow:hidden;position:relative;z-index:1}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:99px}
+.topic .cnt{font-size:.75rem;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;position:relative;z-index:1}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mode{background:var(--glass);border-radius:22px;padding:14px 8px;text-align:center;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .2s cubic-bezier(.3,1.5,.5,1)}
+.mode svg{width:30px;height:30px;color:var(--ciel)}
+.mode span{font-size:.78rem;font-weight:500;color:var(--muted)}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.back{width:44px;height:44px;border-radius:50%;background:var(--glass);display:grid;place-items:center;flex:none}
+.progress{flex:1;height:12px;border-radius:99px;background:var(--glass);overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--menthe),var(--ciel));border-radius:99px;transition:width .4s}
+.count{font-weight:700;font-variant-numeric:tabular-nums;font-size:.9rem;min-width:44px;text-align:right}
+.flip{perspective:1200px;height:310px;margin:6px 0 20px}
+.flip-in{position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.3,1.35,.5,1);transform-style:preserve-3d}
+.flip.on .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;gap:10px;overflow:hidden;-webkit-backdrop-filter:none;backdrop-filter:none}
+.face::after{content:"";position:absolute;inset:0;background:linear-gradient(155deg,rgba(255,255,255,.55),transparent 40%);pointer-events:none}
+.face.f{background:linear-gradient(140deg,rgba(61,123,255,.85),rgba(142,108,255,.8));color:#fff}
+.face.b{background:linear-gradient(140deg,rgba(255,201,60,.92),rgba(255,122,182,.85));color:#1B1530;transform:rotateY(180deg)}
+.face .lbl{position:absolute;top:16px;left:18px;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.face .word{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,7.5vw,2.6rem);line-height:1.1;text-wrap:balance;overflow-wrap:anywhere;position:relative;z-index:1}
+.face .hint{font-size:.85rem;opacity:.85}
+.speak{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.25);color:inherit;display:grid;place-items:center;z-index:2;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{border-radius:22px;padding:16px 12px;font-weight:800;font-family:var(--display);font-size:1.05rem;background:var(--glass-hi);color:var(--ink);transition:transform .2s cubic-bezier(.3,1.5,.5,1)}
+.btn.no{background:linear-gradient(140deg,rgba(255,90,95,.35),rgba(255,122,182,.3)),var(--glass)}
+.btn.yes{background:linear-gradient(140deg,rgba(34,199,154,.45),rgba(61,123,255,.3)),var(--glass)}
+.btn.go{background:linear-gradient(140deg,var(--tomate),var(--rose));color:#fff;width:100%;border-color:rgba(255,255,255,.5)}
+.q{background:var(--glass);border-radius:30px;padding:24px 18px;text-align:center;margin-bottom:16px;position:relative}
+.q .lbl{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.q .word{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,7vw,2.3rem);margin-top:6px;overflow-wrap:anywhere}
+.q .speak{color:var(--ink);border-color:var(--edge);background:var(--glass-hi)}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;background:var(--glass);border-radius:20px;padding:15px 18px;font-weight:600;font-size:1.02rem;transition:transform .2s cubic-bezier(.3,1.5,.5,1),background .2s}
+.opt.ok{background:var(--good);color:#fff}
+.opt.ko{background:var(--bad);color:#fff}
+.opt:disabled{cursor:default}
+.inp{width:100%;font:inherit;font-size:1.2rem;font-weight:600;padding:16px 18px;border-radius:20px;background:var(--glass-hi);color:var(--ink)}
+.acc{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 14px}
+.acc button{min-width:42px;height:42px;border-radius:14px;background:var(--glass);font-weight:700;font-size:1.05rem}
+.feedback{min-height:52px;margin:6px 0 12px;font-weight:700;text-align:center;font-size:1.05rem}
+.feedback.ok{color:var(--good)} .feedback.ko{color:var(--bad)}
+.feedback em{font-style:normal;font-family:var(--display);font-weight:800}
+.result{text-align:center;padding:24px 0}
+.big{font-family:var(--display);font-weight:800;font-size:5rem;line-height:1;letter-spacing:-.05em;background:linear-gradient(135deg,var(--ciel),var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent}
+.result p{color:var(--muted);max-width:32ch;margin:10px auto 22px}
+.stamp{display:inline-block;transform:rotate(-5deg);background:linear-gradient(140deg,var(--citron),var(--rose));color:#1B1530;border-radius:16px;padding:8px 16px;font-family:var(--display);font-weight:800;font-size:1.3rem;box-shadow:0 10px 24px rgba(255,122,182,.35);margin-bottom:18px}
+textarea{width:100%;min-height:170px;font:inherit;font-size:1rem;padding:14px;border-radius:20px;background:var(--glass-hi);color:var(--ink);resize:vertical}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{font-weight:700;font-size:.9rem}
+.note{font-size:.88rem;color:var(--muted);line-height:1.45}
+.list{display:flex;flex-direction:column;border-radius:22px;overflow:hidden;background:var(--glass)}
+.list div{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-bottom:1px solid var(--edge-lo)}
+.list div:last-child{border-bottom:0}
+.list b{font-weight:700}
+.list span{color:var(--muted);text-align:right}
+.del{background:none;border:0;color:var(--bad);font-weight:700;font-size:.85rem;text-decoration:underline;padding:6px 0}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:5;pointer-events:none;
+  padding:0 max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+nav .in{pointer-events:auto;max-width:400px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px;border-radius:999px;
+  background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--edge);box-shadow:var(--shadow)}
+nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 6px;border-radius:999px;font-size:.74rem;font-weight:700;color:var(--muted);transition:background .2s,color .2s}
+nav button[aria-current="page"]{background:var(--glass-hi);color:var(--ink);box-shadow:inset 0 1px 0 var(--edge)}
+nav svg{width:23px;height:23px}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--glass-hi);color:var(--ink);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--edge);box-shadow:var(--shadow);padding:10px 18px;border-radius:999px;font-weight:700;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+.pop{animation:pop .35s ease}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.shake{animation:shake .25s 2}
+.photo{background:var(--glass);border-radius:26px;padding:18px;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.photo b{display:block;font-family:var(--display);font-size:1.1rem;margin-bottom:4px}
+.photo label.btn{display:block}
+.scan{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--muted)}
+.spin{width:20px;height:20px;border:3px solid var(--soft);border-top-color:var(--rose);border-radius:50%;animation:sp .8s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.pick div{cursor:pointer;opacity:.4}
+.pick div.on{opacity:1;background:rgba(34,199,154,.16)}
+ .rev{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow:auto;padding:2px}
+.rv{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;align-items:center}
+.rv input[type=checkbox]{width:22px;height:22px;accent-color:var(--menthe)}
+.ri{min-width:0;font:inherit;font-size:.95rem;padding:10px 12px;border-radius:14px;border:1px solid var(--edge);background:var(--glass-hi);color:var(--ink)}
+.empty{color:var(--muted);text-align:center;padding:16px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="blobs" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="app">
+  <header>
+    <div class="hello" id="hello">Salut Leni&nbsp;! <small>Prête pour quelques mots&nbsp;?</small></div>
+    <div class="stats">
+      <div class="chip" title="Tage in Folge"><span class="dot" style="background:var(--tomate);color:var(--tomate)"></span><span id="streak">0</span><small class="u">Tage</small></div>
+      <div class="chip" title="Punkte"><span class="dot" style="background:var(--citron);color:var(--citron)"></span><span id="xp">0</span><small class="u">Pkt</small></div>
+    </div>
+  </header>
+  <main id="main" class="view"></main>
+</div>
+
+<nav aria-label="Bereiche"><div class="in">
+  <button id="tab-home" data-tab="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7v14H4zM13 5h7v6h-7zM13 13h7v6h-7z"/></svg>Themen</button>
+  <button id="tab-add" data-tab="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Eigene</button>
+  <button id="tab-hard" data-tab="hard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Schwierige</button>
+</div></nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="ocr.js"></script>
+<script>
+const COLORS=["linear-gradient(150deg,rgba(255,201,60,.45),rgba(255,201,60,.08))","linear-gradient(150deg,rgba(255,122,182,.45),rgba(255,122,182,.08))","linear-gradient(150deg,rgba(34,199,154,.45),rgba(34,199,154,.08))","linear-gradient(150deg,rgba(61,123,255,.45),rgba(61,123,255,.08))","linear-gradient(150deg,rgba(255,90,95,.42),rgba(255,90,95,.08))","linear-gradient(150deg,rgba(142,108,255,.45),rgba(142,108,255,.08))"];
+const BUILTIN=[
+ {id:"vacances",fr:"Les vacances",de:"Ferien & Reisen",w:[
+  ["la valise","der Koffer"],["la plage","der Strand"],["le billet","die Fahrkarte"],["la gare","der Bahnhof"],["l'auberge de jeunesse (f.)","die Jugendherberge"],["faire du camping","zelten"],["la mer","das Meer"],["la montagne","das Gebirge"],["le séjour","der Aufenthalt"],["partir en vacances","in den Urlaub fahren"],["la crème solaire","die Sonnencreme"],["se baigner","baden"]]},
+ {id:"ville",fr:"En ville",de:"Stadt & Wege",w:[
+  ["le carrefour","die Kreuzung"],["tourner à gauche","links abbiegen"],["tout droit","geradeaus"],["le quartier","das Viertel"],["la mairie","das Rathaus"],["la boulangerie","die Bäckerei"],["le feu","die Ampel"],["traverser","überqueren"],["le trottoir","der Bürgersteig"],["en face de","gegenüber von"],["à côté de","neben"],["le métro","die U-Bahn"]]},
+ {id:"corps",fr:"Le corps & la santé",de:"Körper & Gesundheit",w:[
+  ["la tête","der Kopf"],["le ventre","der Bauch"],["le bras","der Arm"],["la jambe","das Bein"],["avoir mal à","Schmerzen haben an"],["le médecin","der Arzt"],["être malade","krank sein"],["la fièvre","das Fieber"],["le rhume","der Schnupfen"],["se reposer","sich ausruhen"],["le médicament","das Medikament"],["se casser la jambe","sich das Bein brechen"]]},
+ {id:"medias",fr:"Les médias",de:"Medien & Handy",w:[
+  ["le portable","das Handy"],["envoyer un message","eine Nachricht schicken"],["le réseau social","das soziale Netzwerk"],["télécharger","herunterladen"],["l'écran (m.)","der Bildschirm"],["l'émission (f.)","die Sendung"],["le jeu vidéo","das Videospiel"],["s'abonner à","abonnieren"],["le mot de passe","das Passwort"],["publier","veröffentlichen"],["la publicité","die Werbung"],["être accro à","süchtig sein nach"]]},
+ {id:"sentiments",fr:"Les sentiments",de:"Gefühle & Freunde",w:[
+  ["être content(e)","froh sein"],["être triste","traurig sein"],["avoir peur","Angst haben"],["être en colère","wütend sein"],["être amoureux/-se","verliebt sein"],["se disputer","sich streiten"],["s'entendre bien avec","sich gut verstehen mit"],["la confiance","das Vertrauen"],["être déçu(e)","enttäuscht sein"],["avoir honte","sich schämen"],["le/la meilleur(e) ami(e)","der/die beste Freund(in)"],["s'excuser","sich entschuldigen"]]},
+ {id:"verbes",fr:"Verbes & passé composé",de:"Wichtige Verben",w:[
+  ["j'ai fait","ich habe gemacht"],["je suis allé(e)","ich bin gegangen"],["j'ai pris","ich habe genommen"],["j'ai vu","ich habe gesehen"],["je suis venu(e)","ich bin gekommen"],["j'ai dû","ich musste"],["j'ai pu","ich konnte"],["j'ai mis","ich habe gelegt/angezogen"],["je suis resté(e)","ich bin geblieben"],["j'ai écrit","ich habe geschrieben"],["j'ai lu","ich habe gelesen"],["je me suis levé(e)","ich bin aufgestanden"]]}
+];
+const ACCENTS=["é","è","ê","à","â","ç","î","ï","ô","û","ù","œ","'"];
+
+let S={xp:0,streak:0,last:"",box:{},custom:[],sel:"vacances",name:"Leni"};
+function load(){try{const r=localStorage.getItem("lenis-vocab");if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}}
+function save(){try{localStorage.setItem("lenis-vocab",JSON.stringify(S))}catch(e){}}
+load();
+
+const topics=()=>BUILTIN.concat(S.custom.length?[{id:"custom",fr:"Mes mots",de:"Eigene Vokabeln",w:S.custom}]:[]);
+const key=w=>w[0]+"|"+w[1];
+const lvl=w=>S.box[key(w)]||0; // 0 neu, 1-4 Stufe
+const pct=t=>Math.round(t.w.reduce((a,w)=>a+Math.min(lvl(w),3),0)/(t.w.length*3)*100);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const strip=s=>s.toLowerCase().replace(/\(.*?\)/g,"").replace(/[’`]/g,"'").replace(/\s+/g," ").trim();
+
+function today(){return new Date().toISOString().slice(0,10)}
+function tickStreak(){
+  const t=today(); if(S.last===t)return;
+  const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  S.streak=S.last===y?S.streak+1:1; S.last=t;
+}
+function stats(){$("#xp").textContent=S.xp;$("#streak").textContent=S.streak}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),1600)}
+function grade(w,ok){const k=key(w);S.box[k]=ok?Math.min((S.box[k]||0)+1,4):1;if(ok){S.xp+=10;tickStreak()}save();stats()}
+
+let voice=null;
+function pickVoice(){try{voice=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith("fr"))||null}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
+function say(t){try{const u=new SpeechSynthesisUtterance(t.replace(/\(.*?\)/g,""));u.lang="fr-FR";if(voice)u.voice=voice;u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){toast("Vorlesen geht hier leider nicht")}}
+const SPK='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>';
+const BACK='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
+
+function setTab(t){document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===t?"page":"false"));}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{({home,add:addView,hard:hardView})[b.dataset.tab]()});
+
+function home(){
+  setTab("home");
+  const ts=topics(); if(!ts.find(t=>t.id===S.sel))S.sel=ts[0].id;
+  $("#main").innerHTML=`<h2>Wähl ein Thema</h2><div class="topics">${ts.map((t,i)=>`
+    <button class="topic ${t.id===S.sel?"sel":""}" data-id="${t.id}" style="background-image:${COLORS[i%COLORS.length]}">
+      <span class="fr">${esc(t.fr)}</span><span class="de">${esc(t.de)}</span>
+      <span class="cnt">${t.w.length} Wörter · ${pct(t)}&nbsp;% sicher</span>
+      <span class="bar"><i style="width:${pct(t)}%"></i></span></button>`).join("")}</div>
+    <h2>Wie willst du üben?</h2>
+    <div class="modes">
+      <button class="mode" data-m="cards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="6" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/></svg>Karten<span>umdrehen</span></button>
+      <button class="mode" data-m="quiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6M12 17h.01"/></svg>Quiz<span>4 Antworten</span></button>
+      <button class="mode" data-m="type"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>Schreiben<span>mit Akzenten</span></button>
+    </div>`;
+  document.querySelectorAll(".topic").forEach(b=>b.onclick=()=>{S.sel=b.dataset.id;save();home()});
+  document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>start(b.dataset.m,topics().find(t=>t.id===S.sel).w));
+}
+
+let R; // round
+function start(mode,words,dir){
+  if(!words.length){toast("Hier sind noch keine Wörter");return}
+  const pick=shuffle(words).sort((a,b)=>lvl(a)-lvl(b)).slice(0,10);
+  R={mode,words:shuffle(pick),i:0,ok:0,pool:words,src:words};
+  next();
+}
+function topbar(){return `<div class="top"><button class="back" id="quit" aria-label="Zurück">${BACK}</button>
+  <div class="progress"><i style="width:${R.i/R.words.length*100}%"></i></div><div class="count">${R.i+1}/${R.words.length}</div></div>`}
+function next(){
+  if(R.i>=R.words.length)return done();
+  ({cards,quiz,type})[R.mode]();
+  $("#quit").onclick=home;
+}
+function adv(ok){grade(R.words[R.i],ok);if(ok)R.ok++;R.i++;next()}
+
+function cards(){
+  const w=R.words[R.i];
+  $("#main").innerHTML=topbar()+`<div class="flip" id="flip"><div class="flip-in">
+    <div class="face f"><span class="lbl">Deutsch</span><div class="word">${esc(w[1])}</div><div class="hint">Tippen zum Umdrehen</div></div>
+    <div class="face b"><span class="lbl">Français</span><button class="speak" id="spk" aria-label="Vorlesen">${SPK}</button><div class="word">${esc(w[0])}</div></div>
+  </div></div>
+  <div class="row"><button class="btn no" id="no">Noch nicht</button><button class="btn yes" id="yes">Gewusst!</button></div>`;
+  const f=$("#flip");f.onclick=e=>{if(e.target.closest("#spk"))return;f.classList.toggle("on");if(f.classList.contains("on"))say(w[0])};
+  $("#spk").onclick=()=>say(w[0]);
+  $("#no").onclick=()=>adv(false);$("#yes").onclick=()=>adv(true);
+}
+
+function quiz(){
+  const w=R.words[R.i], toFr=Math.random()<.5;
+  let others=shuffle(BUILTIN.flatMap(t=>t.w).concat(S.custom).filter(x=>key(x)!==key(w))).slice(0,3);
+  const opts=shuffle([w,...others]);
+  $("#main").innerHTML=topbar()+`<div class="q"><div class="lbl">${toFr?"Was heißt auf Französisch …":"Was bedeutet …"}</div>
+    <div class="word">${esc(toFr?w[1]:w[0])}</div>${toFr?"":`<button class="speak" id="spk" aria-label="Vorlesen" >${SPK}</button>`}</div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${esc(toFr?o[0]:o[1])}</button>`).join("")}</div>`;
+  if(!toFr)$("#spk").onclick=()=>say(w[0]);
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const ok=key(opts[b.dataset.i])===key(w);
+    document.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(key(opts[x.dataset.i])===key(w))x.classList.add("ok")});
+    if(!ok){b.classList.add("ko","shake")}else{b.classList.add("pop");say(w[0])}
+    setTimeout(()=>adv(ok),ok?700:1500);
+  });
+}
+
+function type(){
+  const w=R.words[R.i];
+  $("#main").innerHTML=topbar()+`<div class="q"><div class="lbl">Schreib auf Französisch</div><div class="word">${esc(w[1])}</div></div>
+    <form id="tf" autocomplete="off"><input class="inp" id="ans" placeholder="Deine Antwort …" autocapitalize="off" spellcheck="false" aria-label="Antwort auf Französisch">
+    <div class="acc">${ACCENTS.map(a=>`<button type="button" data-a="${a}">${a}</button>`).join("")}</div>
+    <div class="feedback" id="fb" aria-live="polite"></div>
+    <button class="btn go" id="chk">Prüfen</button></form>`;
+  const inp=$("#ans");inp.focus({preventScroll:true});
+  document.querySelectorAll(".acc button").forEach(b=>b.onclick=()=>{const p=inp.selectionStart??inp.value.length;inp.value=inp.value.slice(0,p)+b.dataset.a+inp.value.slice(inp.selectionEnd??p);inp.focus();inp.setSelectionRange(p+1,p+1)});
+  let checked=false,result=false;
+  $("#tf").onsubmit=e=>{e.preventDefault();
+    if(checked)return adv(result);
+    const a=strip(inp.value),c=strip(w[0]),bare=c.replace(/^(le|la|les|l'|un|une)\s*/,"");
+    const noAcc=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"");
+    const fb=$("#fb");
+    if(a===c){result=true;fb.className="feedback ok pop";fb.innerHTML="Parfait&nbsp;!";}
+    else if(noAcc(a)===noAcc(c)){result=true;fb.className="feedback ok";fb.innerHTML=`Fast! Achte auf die Akzente: <em>${esc(w[0])}</em>`;}
+    else if(a===bare){result=false;fb.className="feedback ko";fb.innerHTML=`Artikel nicht vergessen: <em>${esc(w[0])}</em>`;}
+    else{result=false;fb.className="feedback ko";fb.innerHTML=`Richtig wäre: <em>${esc(w[0])}</em>`;inp.classList.add("shake")}
+    say(w[0]);checked=true;$("#chk").textContent="Weiter";inp.readOnly=true;
+  };
+}
+
+function done(){
+  const n=R.words.length,p=Math.round(R.ok/n*100);
+  const msg=p===100?"Incroyable&nbsp;!":p>=70?"Très bien&nbsp;!":p>=40?"Pas mal&nbsp;!":"Courage&nbsp;!";
+  $("#main").innerHTML=`<div class="result pop"><div class="stamp">${msg}</div><div class="big">${R.ok}/${n}</div>
+    <p>${p>=70?"Super Runde. Die Wörter, die noch hakten, kommen beim nächsten Mal zuerst dran.":"Die schwierigen Wörter landen unter „Schwierige“, dort kannst du sie extra üben."}</p>
+    <div class="row"><button class="btn" id="home">Zu den Themen</button><button class="btn go" id="again">Nochmal</button></div></div>`;
+  $("#home").onclick=home;$("#again").onclick=()=>start(R.mode,R.src);
+}
+
+function addView(){
+  setTab("add");
+  $("#main").innerHTML=`<h2>Eigene Vokabeln</h2>
+    <div class="photo" id="photoBox">
+      <div><b>Foto von der Vokabelliste</b><span class="note">Fotografier die Vokabelliste im Buch oder Heft, möglichst gerade und hell. Die Wörter werden auf dem iPhone erkannt, und du prüfst sie vor dem Speichern.</span></div>
+      <label class="btn go" for="pic" style="text-align:center">Foto auswählen</label>
+      <input type="file" id="pic" accept="image/*" hidden>
+      <div id="photoOut"></div>
+    </div>
+    <p class="note">Oder tipp sie selbst ein: pro Zeile ein Wortpaar, getrennt mit einem Bindestrich oder Gleichheitszeichen.</p>
+    <form id="af"><div class="field"><label for="txt">Neue Wörter</label>
+    <textarea id="txt" placeholder="le chat - die Katze&#10;la fenêtre = das Fenster&#10;apprendre - lernen"></textarea></div>
+    <button class="btn go">Hinzufügen</button></form>
+    <h2>Mes mots <span style="font-weight:600;color:var(--muted);font-size:1rem">(${S.custom.length})</span></h2>
+    ${S.custom.length?`<div class="list">${S.custom.map(w=>`<div><b>${esc(w[0])}</b><span>${esc(w[1])}</span></div>`).join("")}</div>
+      <div style="display:flex;gap:16px;align-items:center;justify-content:space-between;margin-top:8px"><button class="del" id="cpy" style="color:var(--ciel)">Liste kopieren</button><button class="del" id="clr">Alle eigenen Wörter löschen</button></div>`
+     :`<div class="empty">Noch keine eigenen Wörter. Danach erscheinen sie als eigenes Thema „Mes mots“.</div>`}`;
+  $("#af").onsubmit=e=>{e.preventDefault();
+    const lines=$("#txt").value.split("\n").map(l=>l.split(/\s+[-–=]\s+|\s*=\s*|\s+-\s*|\t|;/)).filter(p=>p.length>=2&&p[0].trim()&&p[1].trim()).map(p=>[p[0].trim(),p[1].trim()]);
+    if(!lines.length){toast("Schreib z. B.: le chat - die Katze");return}
+    const have=new Set(S.custom.map(key));lines.forEach(l=>{if(!have.has(key(l)))S.custom.push(l)});
+    S.sel="custom";save();toast(lines.length+" Wörter hinzugefügt");addView();
+  };
+  setupPhoto();
+  if(S.custom.length){$("#cpy").onclick=async()=>{const t=S.custom.map(w=>w[0]+" - "+w[1]).join("\n");try{await navigator.clipboard.writeText(t);toast("Liste kopiert")}catch(e){$("#txt").value=t;$("#txt").select();toast("Text markiert, jetzt kopieren")}}}
+  if(S.custom.length){let armed=false;$("#clr").onclick=e=>{if(!armed){armed=true;e.target.textContent="Wirklich löschen? Nochmal tippen";return}S.custom=[];save();toast("Gelöscht");addView()}}
+}
+
+function setupPhoto(){
+  const out=$("#photoOut"),pic=$("#pic");
+  pic.onchange=async()=>{
+    const f=pic.files&&pic.files[0];if(!f)return;
+    out.innerHTML=`<div class="scan"><span class="spin"></span><span id="scanTxt">Foto wird vorbereitet …</span></div><div class="progress" style="margin-top:10px"><i id="scanBar" style="width:0%"></i></div>`;
+    const steps={"loading tesseract core":"Texterkennung wird geladen …","loading language traineddata":"Sprachdaten werden geladen (nur beim ersten Mal) …","initializing api":"Wird gestartet …","recognizing text":"Wörter werden gelesen …"};
+    try{
+      const pairs=await recognizePhoto(f,m=>{const t=$("#scanTxt"),b=$("#scanBar");if(!t)return;if(steps[m.status])t.textContent=steps[m.status];if(b&&typeof m.progress==="number")b.style.width=Math.round(m.progress*100)+"%"});
+      if(!pairs.length){out.innerHTML=`<div class="scan">Auf dem Foto wurden keine Wortpaare gefunden. Fotografier die Liste gerade von oben, mit gutem Licht und ohne Schatten.</div>`;return}
+      renderReview(pairs);
+    }catch(e){
+      out.innerHTML=`<div class="scan">${e&&e.message==="offline"?"Für die Texterkennung braucht die App beim ersten Mal Internet. Verbinde dich mit dem WLAN und versuch es nochmal.":"Das Foto konnte nicht gelesen werden. Versuch es nochmal oder nimm ein anderes Foto."}</div>`;
+    }finally{pic.value=""}
+  };
+}
+function renderReview(pairs){
+  const out=$("#photoOut");
+  out.innerHTML=`<p class="note" style="margin:12px 0 8px"><b>${pairs.length} Wortpaare erkannt.</b> Prüf sie kurz: Tippfehler direkt korrigieren, Falsches abhaken.</p>
+    <div class="rev">${pairs.map((p,i)=>`<div class="rv"><input type="checkbox" id="rc${i}" checked aria-label="Übernehmen"><input class="ri" id="rf${i}" value="${esc(p[0])}" aria-label="Französisch"><input class="ri" id="rd${i}" value="${esc(p[1])}" aria-label="Deutsch"></div>`).join("")}</div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="swap" type="button">Spalten tauschen</button><button class="btn go" id="takeAll" type="button">Übernehmen</button></div>`;
+  const read=()=>pairs.map((_,i)=>[$("#rf"+i).value.trim(),$("#rd"+i).value.trim(),$("#rc"+i).checked]);
+  $("#swap").onclick=()=>renderReview(read().map(([a,b])=>[b,a]));
+  $("#takeAll").onclick=()=>{
+    const chosen=read().filter(r=>r[2]&&r[0]&&r[1]).map(r=>[r[0],r[1]]);
+    if(!chosen.length){toast("Keine Wörter ausgewählt");return}
+    const have=new Set(S.custom.map(key));chosen.forEach(l=>{if(!have.has(key(l)))S.custom.push(l)});
+    S.sel="custom";save();toast(chosen.length+" Wörter übernommen");addView();
+  };
+}
+
+function hardView(){
+  setTab("hard");
+  const all=topics().flatMap(t=>t.w),hard=all.filter(w=>lvl(w)===1);
+  $("#main").innerHTML=`<h2>Schwierige Wörter</h2>
+    <p class="note">Hier sammeln sich alle Wörter, die du zuletzt nicht wusstest. Sobald du eines richtig hast, verschwindet es wieder.</p>
+    ${hard.length?`<div class="list" style="margin:12px 0 16px">${hard.map(w=>`<div><b>${esc(w[0])}</b><span>${esc(w[1])}</span></div>`).join("")}</div>
+      <div class="modes"><button class="mode" data-m="cards">Karten</button><button class="mode" data-m="quiz">Quiz</button><button class="mode" data-m="type">Schreiben</button></div>`
+     :`<div class="empty" style="padding:40px 16px"><div class="stamp">Rien&nbsp;!</div><br>Gerade keine schwierigen Wörter. Übe ein Thema, dann sammeln sie sich hier.</div>`}`;
+  document.querySelectorAll("#main .mode").forEach(b=>b.onclick=()=>start(b.dataset.m,hard));
+}
+
+stats();home();
+</script>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+</script>
+</body>
+</html>

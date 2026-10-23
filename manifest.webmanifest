@@ -1,0 +1,15 @@
+{
+  "name": "Lenis Vocabulaire",
+  "short_name": "Vocabulaire",
+  "description": "Französisch-Vokabeltrainer mit Karteikarten, Quiz, Schreibmodus und Fotoimport",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#E9EDF8",
+  "theme_color": "#E9EDF8",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
