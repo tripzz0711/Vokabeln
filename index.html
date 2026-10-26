@@ -93,6 +93,13 @@ h2{font-family:var(--display);font-weight:800;font-size:1.3rem;margin:24px 0 12p
 .flip{perspective:1200px;height:310px;margin:6px 0 20px}
 .flip-in{position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.3,1.35,.5,1);transform-style:preserve-3d}
 .flip.on .flip-in{transform:rotateY(180deg)}
+/* Safari: Rückseite sicher ausblenden, Wechsel in der Mitte der Drehung */
+.face{transition:visibility 0s linear .18s}
+.face.b{visibility:hidden}
+.flip.on .face.b{visibility:visible}
+.flip.on .face.f{visibility:hidden}
+.face.f{-webkit-transform:rotateY(0deg) translateZ(1px);transform:rotateY(0deg) translateZ(1px)}
+.face .speak{-webkit-backdrop-filter:none;backdrop-filter:none}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;gap:10px;overflow:hidden;-webkit-backdrop-filter:none;backdrop-filter:none}
 .face::after{content:"";position:absolute;inset:0;background:linear-gradient(155deg,rgba(255,255,255,.55),transparent 40%);pointer-events:none}
 .face.f{background:linear-gradient(140deg,rgba(61,123,255,.85),rgba(142,108,255,.8));color:#fff}

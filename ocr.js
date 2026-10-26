@@ -121,7 +121,7 @@ function wordsToPairs(words) {
       const fr = r[fc], de = fc === dc ? "" : r[dc];
       if (fr && de) pairs.push([fr, de]);
       else if (!fr && de && pairs.length) pairs[pairs.length - 1][1] += " " + de;   // umbrochene Übersetzung
-      else if (fr && !de && pairs.length && /^[a-zàâçéèêëîïôûùüÿœáíóúñ¿¡(]/.test(fr) && /[,;]$/.test(pairs[pairs.length - 1][0])) pairs[pairs.length - 1][0] += " " + fr;
+      else if (fr && !de && pairs.length && /^[a-zàâçéèêëîïôûùüÿœáíóúñ¿¡(]/.test(fr) && (/[,;/]$/.test(pairs[pairs.length - 1][0]) || /\([^)]*$/.test(pairs[pairs.length - 1][0]))) pairs[pairs.length - 1][0] += " " + fr;
     });
   }
   if (!pairs.length) {
@@ -138,7 +138,8 @@ function wordsToPairs(words) {
 }
 
 function clean(s) {
-  return s.replace(/\s*\[[^\]]*\]\s*/g, " ")       // Lautschrift [ ... ] entfernen
+  return s.replace(/\s*[\[(][^\[\]()]*\]\s*/g, " ")   // Lautschrift [ ... ] entfernen, auch wenn "[" als "(" gelesen wurde
+          .replace(/\s*\[[^\]]*$/g, "")                 // abgeschnittene Lautschrift am Zeilenende
           .replace(/[|_~«»]+/g, " ")
           .replace(/\s+/g, " ")
           .replace(/^[\s\-–•·.,;:]+|[\s\-–•·]+$/g, "")
